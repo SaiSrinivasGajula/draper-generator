@@ -3,8 +3,7 @@ import fs from "node:fs/promises";
 import { nanoid } from "nanoid";
 import { getDb } from "@/lib/db";
 import { resolveStoragePath, saveBuffer } from "@/lib/storage";
-import { generateLookImage } from "@/lib/imageGen";
-import { GEMINI_API_KEY } from "@/lib/config";
+import { generateLookImage, isImageGenConfigured } from "@/lib/imageGen";
 import type { OutfitItem, ReferencePhoto } from "@/lib/types";
 
 function mimeFromPath(p: string): string {
@@ -15,7 +14,7 @@ function mimeFromPath(p: string): string {
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!GEMINI_API_KEY) {
+  if (!isImageGenConfigured()) {
     return NextResponse.json(
       { error: "AI image generation isn't enabled yet on this deployment.", code: "AI_NOT_CONFIGURED" },
       { status: 503 }
