@@ -36,6 +36,10 @@ export type GeneratedLook = {
   created_at: string;
 };
 
+// OutfitItem enriched with the owning customer's name, for the cross-client
+// wardrobe repository (see /api/outfits and /wardrobe).
+export type OutfitItemWithCustomer = OutfitItem & { customer_name: string };
+
 export type GeneratedLookItem = {
   generated_look_id: string;
   outfit_item_id: string;

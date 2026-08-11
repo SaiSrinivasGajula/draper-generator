@@ -68,6 +68,11 @@ export default function CustomerWorkspacePage({
     load();
   }
 
+  async function handleDeletePhoto(photoId: string) {
+    await fetch(`/api/photos/${photoId}`, { method: "DELETE" });
+    load();
+  }
+
   async function handleAddOutfit(e: React.FormEvent) {
     e.preventDefault();
     if (!outfitUrl.trim()) return;
@@ -232,12 +237,20 @@ export default function CustomerWorkspacePage({
         </p>
         <div className="flex flex-wrap gap-3">
           {referencePhotos.map((p) => (
-            <img
-              key={p.id}
-              src={fileUrl(p.file_path)!}
-              alt={`Reference photo of ${customer.name}`}
-              className="w-28 h-28 object-cover rounded-xl border border-line"
-            />
+            <div key={p.id} className="relative w-28 h-28 group">
+              <img
+                src={fileUrl(p.file_path)!}
+                alt={`Reference photo of ${customer.name}`}
+                className="w-full h-full object-cover rounded-xl border border-line"
+              />
+              <button
+                onClick={() => handleDeletePhoto(p.id)}
+                aria-label="Delete reference photo"
+                className="absolute top-1.5 right-1.5 p-1 rounded-full bg-ink/70 text-cream cursor-pointer transition-colors opacity-0 group-hover:opacity-100 focus-visible:opacity-100 hover:bg-red-700"
+              >
+                <X size={14} aria-hidden="true" />
+              </button>
+            </div>
           ))}
           <button
             onClick={() => photoInputRef.current?.click()}

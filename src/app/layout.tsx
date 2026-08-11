@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Syne, Manrope } from "next/font/google";
+import { NavBar } from "@/components/NavBar";
 import "./globals.css";
 
 const syne = Syne({
@@ -29,7 +30,10 @@ export default function RootLayout({
       lang="en"
       className={`h-full antialiased ${syne.variable} ${manrope.variable}`}
     >
-      <body className="min-h-full flex flex-col bg-cream text-ink font-body">{children}</body>
+      <body className="min-h-full flex flex-col bg-cream text-ink font-body">
+        <NavBar />
+        {children}
+      </body>
     </html>
   );
 }
