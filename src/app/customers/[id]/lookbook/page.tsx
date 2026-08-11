@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, FileText, Loader2, Printer } from "lucide-react";
 import type { Customer, GeneratedLookWithItems, OutfitItem } from "@/lib/types";
+import { lookImagePath } from "@/lib/lookImage";
 
 type CustomerData = {
   customer: Customer;
@@ -102,9 +103,10 @@ export default function LookbookPage({ params }: { params: Promise<{ id: string 
               .map((oid) => outfitById[oid])
               .filter((o): o is OutfitItem => !!o);
             const sites = outfits.map((o) => o.source_site).filter(Boolean);
-            const image = look.image_path && (
+            const imagePath = lookImagePath(look);
+            const image = imagePath && (
               <img
-                src={`/api/files/${look.image_path}`}
+                src={`/api/files/${imagePath}`}
                 alt={`${data.customer.name} wearing an outfit from ${sites.join(" + ") || "a store"}`}
                 className="w-full rounded-2xl border border-line"
               />

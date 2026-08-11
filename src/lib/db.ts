@@ -48,6 +48,7 @@ export function getDb(): Database.Database {
       customer_id TEXT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
       outfit_item_id TEXT NOT NULL REFERENCES outfit_items(id) ON DELETE CASCADE,
       image_path TEXT,
+      final_image_path TEXT,
       status TEXT NOT NULL DEFAULT 'pending',
       error TEXT,
       selected_for_lookbook INTEGER NOT NULL DEFAULT 0,
@@ -74,6 +75,13 @@ export function getDb(): Database.Database {
   const outfitColumns = db.prepare("PRAGMA table_info(outfit_items)").all() as { name: string }[];
   if (!outfitColumns.some((c) => c.name === "category")) {
     db.exec("ALTER TABLE outfit_items ADD COLUMN category TEXT");
+  }
+
+  // final_image_path holds the composited image after a real face photo has
+  // been manually stitched onto a headless generated look (see /api/looks/[id]/face).
+  const lookColumns = db.prepare("PRAGMA table_info(generated_looks)").all() as { name: string }[];
+  if (!lookColumns.some((c) => c.name === "final_image_path")) {
+    db.exec("ALTER TABLE generated_looks ADD COLUMN final_image_path TEXT");
   }
 
   // One-time backfill: older generated_looks rows predate generated_look_items.

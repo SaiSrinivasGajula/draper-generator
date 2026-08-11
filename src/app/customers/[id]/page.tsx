@@ -10,12 +10,15 @@ import {
   FileText,
   Loader2,
   Plus,
+  Smile,
   Sparkles,
   Trash2,
   Upload,
   X,
 } from "lucide-react";
 import type { Customer, GeneratedLookWithItems, OutfitItem, ReferencePhoto } from "@/lib/types";
+import { lookImagePath } from "@/lib/lookImage";
+import { FaceEditor } from "@/components/FaceEditor";
 
 type CustomerData = {
   customer: Customer;
@@ -48,6 +51,7 @@ export default function CustomerWorkspacePage({
   const [selectedOutfitIds, setSelectedOutfitIds] = useState<Set<string>>(new Set());
   const [generating, setGenerating] = useState(false);
   const [creatingPpt, setCreatingPpt] = useState(false);
+  const [faceEditorLookId, setFaceEditorLookId] = useState<string | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -177,6 +181,14 @@ export default function CustomerWorkspacePage({
 
   async function handleDeleteLook(lookId: string) {
     await fetch(`/api/looks/${lookId}`, { method: "DELETE" });
+    load();
+  }
+
+  async function handleFaceSaved(lookId: string, blob: Blob) {
+    const formData = new FormData();
+    formData.append("image", blob, "face-composite.png");
+    await fetch(`/api/looks/${lookId}/face`, { method: "POST", body: formData });
+    setFaceEditorLookId(null);
     load();
   }
 
@@ -470,9 +482,9 @@ export default function CustomerWorkspacePage({
                       {look.error || "Failed"}
                     </div>
                   )}
-                  {look.status === "done" && look.image_path && (
+                  {look.status === "done" && lookImagePath(look) && (
                     <img
-                      src={fileUrl(look.image_path)!}
+                      src={fileUrl(lookImagePath(look))!}
                       alt={`Generated look: ${customer.name} in ${caption || "an outfit"}`}
                       className="w-40 h-40 object-cover rounded-xl border border-line"
                     />
@@ -492,13 +504,24 @@ export default function CustomerWorkspacePage({
                       {look.selected_for_lookbook && <Check size={12} aria-hidden="true" />}
                       In lookbook
                     </button>
-                    <button
-                      onClick={() => handleDeleteLook(look.id)}
-                      aria-label="Delete generated look"
-                      className="p-1 text-muted cursor-pointer transition-colors hover:text-red-700"
-                    >
-                      <X size={14} aria-hidden="true" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setFaceEditorLookId(look.id)}
+                        disabled={look.status !== "done" || referencePhotos.length === 0}
+                        aria-label={look.final_image_path ? "Redo face" : "Add face"}
+                        title={look.final_image_path ? "Redo face" : "Add face"}
+                        className="p-1 text-muted cursor-pointer transition-colors hover:text-accent disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <Smile size={14} aria-hidden="true" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteLook(look.id)}
+                        aria-label="Delete generated look"
+                        className="p-1 text-muted cursor-pointer transition-colors hover:text-red-700"
+                      >
+                        <X size={14} aria-hidden="true" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -506,6 +529,21 @@ export default function CustomerWorkspacePage({
           </div>
         )}
       </section>
+
+      {faceEditorLookId &&
+        (() => {
+          const look = generatedLooks.find((l) => l.id === faceEditorLookId);
+          if (!look || !look.image_path) return null;
+          return (
+            <FaceEditor
+              lookImageUrl={fileUrl(look.image_path)!}
+              referencePhotos={referencePhotos}
+              fileUrl={fileUrl}
+              onCancel={() => setFaceEditorLookId(null)}
+              onSave={(blob) => handleFaceSaved(look.id, blob)}
+            />
+          );
+        })()}
     </main>
   );
 }

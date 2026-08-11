@@ -30,6 +30,10 @@ export type GeneratedLook = {
   customer_id: string;
   outfit_item_id: string;
   image_path: string | null;
+  // Set once a real face photo has been manually stitched onto the headless
+  // generated image (see /api/looks/[id]/face). Prefer this over image_path
+  // wherever a look is displayed to the customer (lookbook, PPT export).
+  final_image_path: string | null;
   status: "pending" | "done" | "failed";
   error: string | null;
   selected_for_lookbook: 0 | 1;

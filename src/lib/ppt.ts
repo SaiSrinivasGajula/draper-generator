@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import PptxGenJS from "pptxgenjs";
 import { imageSize } from "image-size";
 import { resolveStoragePath } from "./storage";
+import { lookImagePath } from "./lookImage";
 import type { Customer, GeneratedLook, OutfitItem } from "./types";
 
 const SLIDE_W = 13.33;
@@ -128,8 +129,9 @@ export async function buildLookbookPpt(
 
       for (let i = 0; i < slideLooks.length; i++) {
         const look = slideLooks[i];
-        if (!look.image_path) continue;
-        const absPath = resolveStoragePath(look.image_path);
+        const imagePath = lookImagePath(look);
+        if (!imagePath) continue;
+        const absPath = resolveStoragePath(imagePath);
         const { width, height } = await imageDimensions(absPath);
         const aspect = width / height;
 
