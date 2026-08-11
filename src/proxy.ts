@@ -13,7 +13,10 @@ export function proxy(req: NextRequest) {
     pathname === "/login" ||
     pathname === "/api/auth/login" ||
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/api/files")
+    pathname.startsWith("/api/files") ||
+    // Public, no-login client-facing lookbook (share link + its data/heart-toggle API).
+    pathname.startsWith("/lb/") ||
+    pathname.startsWith("/api/public/")
   ) {
     return NextResponse.next();
   }

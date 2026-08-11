@@ -17,3 +17,10 @@ export const OPENAI_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1
 export const IMAGE_PROVIDER_OVERRIDE = (process.env.IMAGE_PROVIDER || "").toLowerCase();
 
 export const APP_PASSWORD = process.env.APP_PASSWORD || "";
+
+// Client-facing lookbook share links (see /lb/[token]) — the stylist's
+// WhatsApp contact surfaced in the public "message your stylist" footer
+// button. Blank hides the button. NEXT_PUBLIC_ prefix is required (unlike
+// every other var above) since these are read from a client component.
+export const STYLIST_WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_STYLIST_WHATSAPP_NUMBER || "";
+export const STYLIST_DISPLAY_NAME = process.env.NEXT_PUBLIC_STYLIST_DISPLAY_NAME || "";

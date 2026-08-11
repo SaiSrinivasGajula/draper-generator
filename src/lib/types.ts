@@ -4,6 +4,11 @@ export type Customer = {
   contact: string | null;
   notes: string | null;
   created_at: string;
+  // Powers the public, no-login lookbook link (/lb/[token]); null until a
+  // stylist generates one (see /api/customers/[id]/share).
+  share_token: string | null;
+  // Stamped once, the first time the client actually opens their share link.
+  first_viewed_at: string | null;
 };
 
 export type ReferencePhoto = {
@@ -37,6 +42,8 @@ export type GeneratedLook = {
   status: "pending" | "done" | "failed";
   error: string | null;
   selected_for_lookbook: 0 | 1;
+  // Set by the client from the public share link when they heart a look.
+  client_loved: 0 | 1;
   created_at: string;
 };
 

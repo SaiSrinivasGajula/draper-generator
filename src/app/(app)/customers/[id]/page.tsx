@@ -6,10 +6,13 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  Copy,
   ExternalLink,
   FileText,
+  Heart,
   Loader2,
   Plus,
+  RefreshCw,
   Smile,
   Sparkles,
   Trash2,
@@ -52,6 +55,8 @@ export default function CustomerWorkspacePage({
   const [generating, setGenerating] = useState(false);
   const [creatingPpt, setCreatingPpt] = useState(false);
   const [faceEditorLookId, setFaceEditorLookId] = useState<string | null>(null);
+  const [gettingShareLink, setGettingShareLink] = useState(false);
+  const [copied, setCopied] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -184,6 +189,25 @@ export default function CustomerWorkspacePage({
     load();
   }
 
+  async function handleGetShareLink(regenerate: boolean) {
+    setGettingShareLink(true);
+    setCopied(false);
+    await fetch(`/api/customers/${id}/share`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ regenerate }),
+    });
+    setGettingShareLink(false);
+    load();
+  }
+
+  function handleCopyShareLink(token: string) {
+    const url = `${window.location.origin}/lb/${token}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   async function handleFaceSaved(lookId: string, blob: Blob) {
     const formData = new FormData();
     formData.append("image", blob, "face-composite.png");
@@ -240,6 +264,61 @@ export default function CustomerWorkspacePage({
           </Link>
         </div>
       </div>
+
+      {/* Client share link */}
+      <section className="mb-10 bg-surface border border-line rounded-2xl p-5">
+        <h2 className="font-display text-sm font-bold text-ink mb-0.5">Share with client</h2>
+        <p className="text-sm text-muted mb-3">
+          A no-login link showing only the looks marked &quot;In lookbook&quot; — safe to send directly.
+        </p>
+        {customer.share_token ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              readOnly
+              value={`/lb/${customer.share_token}`}
+              onFocus={(e) => e.target.select()}
+              className="flex-1 min-w-[200px] border border-line rounded-lg px-3 py-2 text-sm text-muted bg-cream outline-none"
+            />
+            <button
+              onClick={() => handleCopyShareLink(customer.share_token!)}
+              className="inline-flex items-center gap-1.5 min-h-9 border border-line rounded-lg px-3 py-1.5 text-sm font-semibold text-ink cursor-pointer transition-colors hover:border-ink/40"
+            >
+              <Copy size={14} aria-hidden="true" />
+              {copied ? "Copied!" : "Copy"}
+            </button>
+            <button
+              onClick={() => handleGetShareLink(true)}
+              disabled={gettingShareLink}
+              title="Invalidates the current link and issues a new one"
+              className="inline-flex items-center gap-1.5 min-h-9 text-sm font-medium text-muted cursor-pointer transition-colors hover:text-ink disabled:opacity-50"
+            >
+              <RefreshCw size={13} aria-hidden="true" className={gettingShareLink ? "animate-spin" : ""} />
+              Regenerate
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => handleGetShareLink(false)}
+            disabled={gettingShareLink}
+            className="inline-flex items-center gap-1.5 min-h-9 bg-ink text-cream rounded-lg px-3.5 py-1.5 text-sm font-semibold cursor-pointer transition-colors hover:bg-ink/90 disabled:opacity-50"
+          >
+            {gettingShareLink && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
+            {gettingShareLink ? "Generating…" : "Generate share link"}
+          </button>
+        )}
+        {customer.first_viewed_at ? (
+          <p className="text-xs text-accent-hover font-medium mt-2.5">
+            Client viewed this lookbook on{" "}
+            {new Date(customer.first_viewed_at).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </p>
+        ) : (
+          customer.share_token && <p className="text-xs text-muted mt-2.5">Not viewed yet.</p>
+        )}
+      </section>
 
       {/* Reference photos */}
       <section className="mb-12">
@@ -505,6 +584,11 @@ export default function CustomerWorkspacePage({
                       In lookbook
                     </button>
                     <div className="flex items-center gap-1">
+                      {!!look.client_loved && (
+                        <span title="Client loved this look" className="p-1 text-red-500">
+                          <Heart size={14} className="fill-current" aria-hidden="true" />
+                        </span>
+                      )}
                       <button
                         onClick={() => setFaceEditorLookId(look.id)}
                         disabled={look.status !== "done" || referencePhotos.length === 0}

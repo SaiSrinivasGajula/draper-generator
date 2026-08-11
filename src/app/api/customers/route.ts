@@ -25,6 +25,8 @@ export async function POST(req: NextRequest) {
     contact: body.contact?.trim() || null,
     notes: body.notes?.trim() || null,
     created_at: new Date().toISOString(),
+    share_token: null,
+    first_viewed_at: null,
   };
 
   db.prepare(

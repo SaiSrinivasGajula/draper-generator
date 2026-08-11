@@ -83,6 +83,22 @@ export function getDb(): Database.Database {
   if (!lookColumns.some((c) => c.name === "final_image_path")) {
     db.exec("ALTER TABLE generated_looks ADD COLUMN final_image_path TEXT");
   }
+  // client_loved is set by the client from the public share link (see
+  // /api/public/lookbook/[token]/looks/[id]/love) when they heart a look.
+  if (!lookColumns.some((c) => c.name === "client_loved")) {
+    db.exec("ALTER TABLE generated_looks ADD COLUMN client_loved INTEGER NOT NULL DEFAULT 0");
+  }
+
+  // share_token powers the public, no-login lookbook link (/lb/[token]);
+  // first_viewed_at is stamped once the client actually opens that link.
+  const customerColumns = db.prepare("PRAGMA table_info(customers)").all() as { name: string }[];
+  if (!customerColumns.some((c) => c.name === "share_token")) {
+    db.exec("ALTER TABLE customers ADD COLUMN share_token TEXT");
+  }
+  if (!customerColumns.some((c) => c.name === "first_viewed_at")) {
+    db.exec("ALTER TABLE customers ADD COLUMN first_viewed_at TEXT");
+  }
+  db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_share_token ON customers(share_token)");
 
   // One-time backfill: older generated_looks rows predate generated_look_items.
   // Idempotent — only runs while the join table is still empty.

@@ -36,3 +36,13 @@ body {
     background: white;
   }
 }
+
+/* Public lookbook carousel: hide the scrollbar on the horizontally
+   scrollable "shop this look" chip row, while staying scrollable. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
