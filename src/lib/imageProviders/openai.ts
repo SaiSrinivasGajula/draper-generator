@@ -24,6 +24,12 @@ export async function generateWithOpenAI(
   const form = new FormData();
   form.set("model", OPENAI_IMAGE_MODEL);
   form.set("prompt", PROMPT);
+  // Defaults are noticeably lower-effort than what the ChatGPT UI applies —
+  // set these explicitly for quality comparable to it.
+  form.set("quality", "high");
+  form.set("size", "1024x1536"); // portrait, suited to full-body fashion shots
+  form.set("input_fidelity", "high"); // preserve the person's face/likeness accurately
+  form.set("background", "opaque"); // matches the requested solid white studio backdrop
   for (const img of [...referencePhotos, ...outfitPhotos]) {
     const blob = new Blob([new Uint8Array(img.data)], { type: img.mimeType });
     form.append("image[]", blob, `image.${extFromMime(img.mimeType)}`);
