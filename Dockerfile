@@ -12,6 +12,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# NEXT_PUBLIC_* vars are inlined into the client bundle at build time, so
+# they must be passed as build args (see fly-deploy.yml), not just runtime
+# secrets — a runtime-only secret would never reach the compiled JS.
+ARG NEXT_PUBLIC_STYLIST_WHATSAPP_NUMBER=""
+ARG NEXT_PUBLIC_STYLIST_DISPLAY_NAME=""
+ENV NEXT_PUBLIC_STYLIST_WHATSAPP_NUMBER=$NEXT_PUBLIC_STYLIST_WHATSAPP_NUMBER
+ENV NEXT_PUBLIC_STYLIST_DISPLAY_NAME=$NEXT_PUBLIC_STYLIST_DISPLAY_NAME
 RUN npm run build
 
 FROM node:22-bookworm-slim AS runner
