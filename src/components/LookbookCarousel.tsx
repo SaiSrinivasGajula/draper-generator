@@ -139,7 +139,7 @@ export function LookbookCarousel({
         <button
           onClick={handleShare}
           aria-label="Share this lookbook"
-          className="p-2 rounded-full bg-white/10 text-cream cursor-pointer backdrop-blur-sm transition-colors hover:bg-white/20"
+          className="p-2 rounded-full bg-black/40 text-cream cursor-pointer backdrop-blur-sm shadow-sm transition-colors hover:bg-black/60"
         >
           <Share2 size={16} aria-hidden="true" />
         </button>
@@ -190,14 +190,14 @@ export function LookbookCarousel({
       {activeIndex > 0 && (
         <ChevronLeft
           size={22}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-20 text-cream/50 pointer-events-none"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-20 text-cream/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)] pointer-events-none"
           aria-hidden="true"
         />
       )}
       {activeIndex < looks.length - 1 && (
         <ChevronRight
           size={22}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-20 text-cream/50 pointer-events-none"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-20 text-cream/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)] pointer-events-none"
           aria-hidden="true"
         />
       )}
@@ -208,7 +208,7 @@ export function LookbookCarousel({
           onClick={() => toggleLove(active.id)}
           aria-pressed={loved[active.id]}
           aria-label={loved[active.id] ? "Unlove this look" : "Love this look"}
-          className="absolute top-24 right-4 z-30 p-3 rounded-full bg-white/10 backdrop-blur-sm cursor-pointer transition-colors hover:bg-white/20"
+          className="absolute top-24 right-4 z-30 p-3 rounded-full bg-black/40 backdrop-blur-sm shadow-sm cursor-pointer transition-colors hover:bg-black/60"
         >
           <Heart
             size={20}
@@ -251,7 +251,7 @@ export function LookbookCarousel({
           href={`https://wa.me/${stylistWhatsapp}?text=${encodeURIComponent("Hi! I have a question about my lookbook.")}`}
           target="_blank"
           rel="noreferrer"
-          className="absolute bottom-4 left-4 z-30 inline-flex items-center gap-1.5 text-xs font-semibold bg-white/10 text-cream rounded-full px-3 py-2 backdrop-blur-sm cursor-pointer transition-colors hover:bg-white/20"
+          className="absolute bottom-4 left-4 z-30 inline-flex items-center gap-1.5 text-xs font-semibold bg-black/40 text-cream rounded-full px-3 py-2 backdrop-blur-sm shadow-sm cursor-pointer transition-colors hover:bg-black/60"
         >
           <MessageCircle size={13} aria-hidden="true" />
           Message {stylistName || "your stylist"}
